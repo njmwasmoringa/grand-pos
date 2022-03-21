@@ -6,7 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Point of Sale</title>
 
-    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="./css/index.css">
+    <script src="./js/user.js"></script>
+    <script src="./js/service.js"></script>
+    <script src="./js/index.js"></script>
 </head>
 <body>
 
@@ -15,21 +18,31 @@
             <h3>GRAND POS</h3>
 
             <div>
-                <a href="" class="pos-btn">Sign In</a>
+                <a href="" class="pos-btn" id="signInBtn">Sign In</a>
+                <span id="userDisplay"></span>
+                <a href="" class="pos-btn" id="signOutBtn">Sign Out</a>
             </div>
         </div>
 
         <section class="pos-display-flex pos-padding-10">
             <div id="products" class="pos-flex-fill pos-padding-10">
                 <form>
-                    <div class="form-group">
-                        <input type="text" name="" id="" placeholder="Search Product">
+                    <div class="form-group pos-display-flex">
+                        <div class="pos-flex-fill">
+                            <input type="text" name="" id="filterValueInput" placeholder="Search Product">
+                        </div>
+                        <div class="pos-w-30">
+                            <select name="by" id="by">
+                                <option value="name">Name</option>
+                                <option value="code">Code</option>
+                            </select>
+                        </div>
                     </div>
                 </form>
 
                 <br>
 
-                <table class="pos-table pos-table-striped">
+                <table class="pos-table pos-table-striped" id="productsGrid">
                     <thead>
                         <tr cellspacing="0">
                             <th>Product Name</th>
@@ -39,7 +52,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr cellspacing="0">
+                        <!-- <tr cellspacing="0">
                             <td>Product Name</td>
                             <td>Code</td>
                             <td>Quantity in stock</td>
@@ -59,39 +72,92 @@
                             <td>Quantity in stock</td>
                             <td>Price</td>
                             <td><button type="button" class="post-btn">Select</button></td> 
-                        </tr>
+                        </tr> -->
                     </tbody>
                 </table>
             </div>
             <div id="items-added" class="pos-w-30 pos-padding-10 pos-display-flex pos-flex-column">
                 <h4>Items Added</h4>
-                <div id="cart"></div>
+                <table class="pos-table" id="itemsToCheckout">
+                    <thead>
+                        <tr cellspacing="0">
+                            <th>Product</th>
+                            <th>Qty</th>
+                            <th>@</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
                 <div class="pos-flex-end pos-display-flex pos-flex-justify-between pos-w-100">
-                    <div>Total Sales</div> <h4 class="pos-flex-end" id="total">0.00</h4>
+                    <div>Total Sales</div> <h4 class="pos-flex-end total" id="">0.00</h4>
+                </div>  
+                <div>
+                    <button type="button" class="pos-btn" id="checkOutBtn">Checkout</button>
                 </div>
             </div>
         </section>
     </div>
 
     <template id="signin">
-        <form class="form" action="" class="pos-modal">
+        <form class="form pos-modal" id="signInForm" action="">
             <div class="pos-modal-content">
-                <div class="pos-modal-header pos-padding-10 pos-display-flex pos-flex-center">
-                    <h3>Title</h3>
-                    <div><button class="pos-close">&times;</button></div>
+                <div class="pos-modal-header pos-padding-10 pos-display-flex pos-flex-center pos-flex-justify-between">
+                    <h3>Sign In</h3>
                 </div>
                 <div class="pos-modal-body pos-padding-10">
                     <div class="form-group">
                         <label for="username">Username</label>
-                        <input type="text" name="username" id="username">
+                        <input type="text" name="username" id="username" required>
                     </div>
                     <div class="form-group">
-                        <label for="username">Username</label>
-                        <input type="text" name="username" id="username">
+                        <label for="password">Password</label>
+                        <input type="password" name="password" id="password" required>
                     </div>
                 </div>
                 <div class="pos-modal-footer pos-padding-10">
                     <button class="btn">Sign In</button>
+                </div>
+            </div>
+        </form>
+    </template>
+
+    <template id="quantityAdderTmpl">
+        <div class="form pos-modal" id="quantityAdder">
+            <div class="pos-modal-content">
+                <div class="pos-modal-header pos-padding-10 pos-display-flex pos-flex-center pos-flex-justify-between">
+                    <h3>How Many</h3>
+                    <div><button class="pos-close" type="button">&times;</button></div>
+                </div>
+                <div class="pos-modal-body pos-padding-10">
+                    <div class="form-group">
+                        <label for="qty">Quantity</label>
+                        <input type="number" name="qty" id="qty" value="1" required>
+                    </div>
+                </div>
+                <div class="pos-modal-footer pos-padding-10">
+                    <button type="button" class="btn" id="ok">Ok</button>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <template id="checkOut">
+        <form class="form pos-modal" id="checkOutForm" action="">
+            <div class="pos-modal-content">
+                <div class="pos-modal-header pos-padding-10 pos-display-flex pos-flex-center pos-flex-justify-between">
+                    <h3>checkout</h3>
+                    <div><button class="pos-close" type="button">&times;</button></div>
+                </div>
+                <div class="pos-modal-body pos-padding-10">
+                    <h3><span>Pay</span> <span class="total">0.00</span></h3>
+                    <div class="form-group">
+                        <label for="amount">Amount</label>
+                        <input type="number" name="amount" id="amount" required>
+                    </div>
+                    <h3><span>Change</span> <span class="change">0</span></h3>
+                </div>
+                <div class="pos-modal-footer pos-padding-10">
+                    <button class="btn" id="doneBtn">Done</button>
                 </div>
             </div>
         </form>
